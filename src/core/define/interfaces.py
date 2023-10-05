@@ -71,5 +71,10 @@ class APICaller(Protocol, Generic[I_, O_]):
 
 IHandler = Handler
 IDataLoader = DataLoader
+IModel = Model
+IOptimizater = Optimizater
+INet = Net
+ITrainer = Trainer
+IEvaluator = Evaluator
 IProcessor = Processor
 IAPICaller = APICaller
