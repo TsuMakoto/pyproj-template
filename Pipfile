@@ -1,0 +1,61 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+python-dotenv = "*"
+numpy = "*"
+pandas = "*"
+openpyxl = "*"
+pyyaml = "*"
+dill = "*"
+
+
+[dev-packages]
+# コードフォーマッター
+isort = "*"
+autopep8 = "*"
+flake8 = "*"
+jedi = "*"
+
+# notebook
+ipywidgets = "*"
+matplotlib = "*"
+jupyter = "*"
+jupyterlab = "*"
+seaborn = "*"
+tqdm = "*"
+
+# デバッグ/検証
+ipython = "*"
+ipdb = "*"
+pytest = "*"
+
+# ログ
+loguru = "*"
+
+# AWS
+minio = "*"
+chalice = "*"
+boto3 = "*"
+
+# visualization
+mitoinstaller = "*"
+autoviz = "*"
+
+pycaret = "*" # auto ml
+
+# 入力系
+click = "*"
+fire = "*"
+
+# グラフ
+networkx = "*"
+
+[requires]
+python_version = "3.10"
+
+[scripts]
+install_mito = "python -m mitoinstaller install"
+install_labextensions = "jupyter labextension install @jupyter-widgets/jupyterlab-manager"

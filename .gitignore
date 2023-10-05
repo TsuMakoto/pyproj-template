@@ -1,0 +1,9 @@
+reports/*
+logs/*
+datasets/*
+.virtual_documents
+.ipynb_checkpoints
+keys/*
+__pycache__
+
+!**/.keep
