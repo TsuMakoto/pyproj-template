@@ -1,211 +1,258 @@
 import sys
 from pathlib import Path
-from typing import Final, Generic, TypeVar
+from typing import Generic, NamedTuple, Protocol, TypeVar
 
-T = TypeVar('T')
+T = TypeVar('T', covariant=True)
+U = TypeVar('U')
 
 
-class _Const:
-    class Define(Generic[T]):
-        def __init__(self, id_: int, val: T, **kwargs):
-            self.id = id_
-            self.val = val
-            for k, v in kwargs.items():
-                setattr(self, k, v)
+class Const(Protocol[T]):
+    """
+    定数クラスのプロトコル。
 
-        def __eq__(self, other):
-            return self.id == other.id and self.val == other.val
+    このプロトコルは、定数オブジェクトのインターフェースを示すものです。
+    ジェネリック型変数 T を持つ任意のオブジェクトがこのインターフェースを満たすことが期待されます。
 
-        def __hash__(self):
-            return hash((self.id, self.val))
+    Attributes:
+        id_ (int): 定数のID。
+        val (T): 定数の値。
 
-        @property
-        def get(self) -> Final[T]:
-            return self.val
+    Methods:
+        get: 定数の値を取得するためのプロパティ。
+    """
 
+    def __init__(self, id_: int, val: T) -> None:
+        """
+        Const クラスのコンストラクタ。
+
+        Args:
+            id_ (int): 定数のID。
+            val (T): 定数の値。
+        """
+        ...
+
+    @property
+    def get(self) -> T:
+        """
+        定数の値を取得するためのプロパティ。
+
+        Returns:
+            T: 定数の値。
+        """
+        ...
+
+
+class _Const(Const, Generic[U]):
+    def __init__(self, id_: int, val: U):
+        self.id = id_
+        self.__val = val
+
+    def __eq__(self, other):
+        return self.id == other.id and self.__val == other.__val
+
+    def __hash__(self):
+        return hash((self.id, self.__val))
+
+    @property
+    def get(self) -> U:
+        return self.__val
+
+
+class _DefineConst:
     def __init__(self):
         self.id = 0
 
-    def __call__(self, val: T, **kwargs) -> "_Const.Define[T]":
+    def __call__(self, val: U) -> Const[U]:
         self.id += 1
-        return _Const.Define(self.id, val, **kwargs)
+
+        return _Const[U](self.id, val)
 
 
-class _Consts:
-    define = _Const()
+class Structs:
+    class Format:
+        class Date(NamedTuple):
+            ja: Const[str]
+            slash: Const[str]
+            hyphen: Const[str]
+            dot: Const[str]
+
+    class Translate(NamedTuple):
+        ja: Const[str]
+        en: Const[str]
+
+    class PathName(NamedTuple):
+        name: Const[str]
+
+        @property
+        def path(self) -> Const[Path]:
+            return const(Path(self.name.get))
 
 
-class consts(_Consts):
+const = _DefineConst()
+
+
+class Consts:
     # --------------------------------------------------
     # 汎用
     # --------------------------------------------------
 
     class Regex:
-        PHONE_NUMBER = _Consts.define(r"0\d{1,4}-\d{1,4}-\d{4}")
-        POSTAL_CODE = _Consts.define(r"\d{3}-\d{4}")
-        EMAIL = _Consts.define(
-            r"[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+")
+        PHONE_NUMBER = const(r"0\d{1,4}-\d{1,4}-\d{4}")
+        POSTAL_CODE = const(r"\d{3}-\d{4}")
+        EMAIL = const(r"[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+")
 
     class Format:
-        DATE = _Consts.define(
-            "%Y-%m-%d",
-            ja="%Y年%m月%d日",
-            slash="%Y/%m/%d",
-            hyphen="%Y-%m-%d",
-            dot="%Y.%m.%d",
-        )
-        DATETIME = _Consts.define(
-            "%Y-%m-%d %H:%M:%S",
-            ja="%Y年%m月%d日 %H時%M分%S秒",
-            slash="%Y/%m/%d %H:%M:%S",
-            hyphen="%Y-%m-%d %H:%M:%S",
-            dot="%Y.%m.%d %H:%M:%S"
-        )
-        TIME = _Consts.define(
-            "%H:%M:%S",
-            ja="%H時%M分%S秒"
-        )
+        class Date:
+            DATE = Structs.Format.Date(
+                ja=const("%Y年%m月%d日"),
+                slash=const("%Y/%m/%d"),
+                hyphen=const("%Y-%m-%d"),
+                dot=const("%Y.%m.%d"),
+            )
+            DATETIME = Structs.Format.Date(
+                ja=const("%Y年%m月%d日 %H時%M分%S秒"),
+                slash=const("%Y/%m/%d %H:%M:%S"),
+                hyphen=const("%Y-%m-%d %H:%M:%S"),
+                dot=const("%Y.%m.%d %H:%M:%S")
+            )
 
     class Month:
-        JAN = _Consts.define("January", ja="1月")
-        FEB = _Consts.define("February", ja="2月")
-        MAR = _Consts.define("March", ja="3月")
-        APR = _Consts.define("April", ja="4月")
-        MAY = _Consts.define("May", ja="5月")
-        JUN = _Consts.define("June", ja="6月")
-        JUL = _Consts.define("July", ja="7月")
-        AUG = _Consts.define("August", ja="8月")
-        SEP = _Consts.define("September", ja="9月")
-        OCT = _Consts.define("October", ja="10月")
-        NOV = _Consts.define("November", ja="11月")
-        DEC = _Consts.define("December", ja="12月")
+        JAN = Structs.Translate(en=const("January"), ja=const("1月"))
+        FEB = Structs.Translate(en=const("February"), ja=const("2月"))
+        MAR = Structs.Translate(en=const("March"), ja=const("3月"))
+        APR = Structs.Translate(en=const("April"), ja=const("4月"))
+        MAY = Structs.Translate(en=const("May"), ja=const("5月"))
+        JUN = Structs.Translate(en=const("June"), ja=const("6月"))
+        JUL = Structs.Translate(en=const("July"), ja=const("7月"))
+        AUG = Structs.Translate(en=const("August"), ja=const("8月"))
+        SEP = Structs.Translate(en=const("September"), ja=const("9月"))
+        OCT = Structs.Translate(en=const("October"), ja=const("10月"))
+        NOV = Structs.Translate(en=const("November"), ja=const("11月"))
+        DEC = Structs.Translate(en=const("December"), ja=const("12月"))
 
     class Week:
-        MON = _Consts.define("Monday", ja="月曜日")
-        TUE = _Consts.define("Tuesday", ja="火曜日")
-        WED = _Consts.define("Wednesday", ja="水曜日")
-        THU = _Consts.define("Thursday", ja="木曜日")
-        FRI = _Consts.define("Friday", ja="金曜日")
-        SAT = _Consts.define("Saturday", ja="土曜日")
-        SUN = _Consts.define("Sunday", ja="日曜日")
+        MON = Structs.Translate(en=const("Monday"), ja=const("月曜日"))
+        TUE = Structs.Translate(en=const("Tuesday"), ja=const("火曜日"))
+        WED = Structs.Translate(en=const("Wednesday"), ja=const("水曜日"))
+        THU = Structs.Translate(en=const("Thursday"), ja=const("木曜日"))
+        FRI = Structs.Translate(en=const("Friday"), ja=const("金曜日"))
+        SAT = Structs.Translate(en=const("Saturday"), ja=const("土曜日"))
+        SUN = Structs.Translate(en=const("Sunday"), ja=const("日曜日"))
 
     class Season:
-        SPRING = _Consts.define("Spring", ja="春")
-        SUMMER = _Consts.define("Summer", ja="夏")
-        AUTUMN = _Consts.define("Autumn", ja="秋")
-        WINTER = _Consts.define("Winter", ja="冬")
+        SPRING = Structs.Translate(en=const("Spring"), ja=const("春"))
+        SUMMER = Structs.Translate(en=const("Summer"), ja=const("夏"))
+        AUTUMN = Structs.Translate(en=const("Autumn"), ja=const("秋"))
+        WINTER = Structs.Translate(en=const("Winter"), ja=const("冬"))
 
     class Status:
-        OK = _Consts.define("OK")
-        ERROR = _Consts.define("ERROR")
-        WARNING = _Consts.define("WARNING")
+        OK = const("OK")
+        ERROR = const("ERROR")
+        WARNING = const("WARNING")
 
     class Extension:
-        EXCEL = _Consts.define("xlsx")
-        CSV = _Consts.define("csv")
-        JSON = _Consts.define("json")
-        YAML = _Consts.define("yaml")
-        YML = _Consts.define("yml")
-        TXT = _Consts.define("txt")
-        XML = _Consts.define("xml")
-        PDF = _Consts.define("pdf")
-        PNG = _Consts.define("png")
-        JPG = _Consts.define("jpg")
-        GIF = _Consts.define("gif")
-        MP4 = _Consts.define("mp4")
-        WAV = _Consts.define("wav")
-        ZIP = _Consts.define("zip")
-        DAT = _Consts.define("dat")
-        DAT = _Consts.define("dat")
-        PKL = _Consts.define("pkl")
-        PTH = _Consts.define("pth")
+        EXCEL = const("xlsx")
+        CSV = const("csv")
+        JSON = const("json")
+        YAML = const("yaml")
+        YML = const("yml")
+        TXT = const("txt")
+        XML = const("xml")
+        PDF = const("pdf")
+        PNG = const("png")
+        JPG = const("jpg")
+        GIF = const("gif")
+        MP4 = const("mp4")
+        WAV = const("wav")
+        ZIP = const("zip")
+        DAT = const("dat")
+        DAT = const("dat")
+        PKL = const("pkl")
+        PTH = const("pth")
 
     class Encoding:
-        UTF8 = _Consts.define("utf-8")
-        UTF16 = _Consts.define("utf-16")
-        SHIFT_JIS = _Consts.define("shift-jis")
-        EUC_JP = _Consts.define("euc-jp")
+        UTF8 = const("utf-8")
+        UTF16 = const("utf-16")
+        SHIFT_JIS = const("shift-jis")
+        EUC_JP = const("euc-jp")
 
     class Delimiter:
-        COMMA = _Consts.define(",")
-        TAB = _Consts.define("\t")
-        SPACE = _Consts.define(" ")
+        COMMA = const(",")
+        TAB = const("\t")
+        SPACE = const(" ")
 
     class LineFeed:
-        CRLF = _Consts.define("\r\n")
-        LF = _Consts.define("\n")
+        CRLF = const("\r\n")
+        LF = const("\n")
 
     class OS:
-        WINDOWS = _Consts.define("windows")
-        MAC = _Consts.define("mac")
-        LINUX = _Consts.define("linux")
+        WINDOWS = const("windows")
+        MAC = const("mac")
+        LINUX = const("linux")
 
     class MAX:
-        INT = _Consts.define(sys.maxsize)
-        FLOAT = _Consts.define(sys.float_info.max)
+        INT = const(sys.maxsize)
+        FLOAT = const(sys.float_info.max)
 
     # --------------------------------------------------
     # 学習モデル関連
     # --------------------------------------------------
 
     class Optimizer:
-        SGD = _Consts.define("SGD")
-        ADAM = _Consts.define("Adam")
-        ADAGRAD = _Consts.define("Adagrad")
-        ADADELTA = _Consts.define("Adadelta")
-        RMS_PROP = _Consts.define("RMSprop")
+        SGD = const("SGD")
+        ADAM = const("Adam")
+        ADAGRAD = const("Adagrad")
+        ADADELTA = const("Adadelta")
+        RMS_PROP = const("RMSprop")
 
     class Loss:
-        MSE = _Consts.define("MSE")
-        MAE = _Consts.define("MAE")
-        RMSE = _Consts.define("RMSE")
-        R2 = _Consts.define("R2")
+        MSE = const("MSE")
+        MAE = const("MAE")
+        RMSE = const("RMSE")
+        R2 = const("R2")
 
     class Metric:
-        ACCURACY = _Consts.define("accuracy")
-        PRECISION = _Consts.define("precision")
-        RECALL = _Consts.define("recall")
-        F1 = _Consts.define("f1")
+        ACCURACY = const("accuracy")
+        PRECISION = const("precision")
+        RECALL = const("recall")
+        F1 = const("f1")
 
     class Layer:
-        DENSE = _Consts.define("Dense")
-        CONV2D = _Consts.define("Conv2D")
-        MAX_POOLING2D = _Consts.define("MaxPooling2D")
-        FLATTEN = _Consts.define("Flatten")
-        LSTM = _Consts.define("LSTM")
-        GRU = _Consts.define("GRU")
-        BIDIRECTIONAL = _Consts.define("Bidirectional")
-        DROPOUT = _Consts.define("Dropout")
-        BATCH_NORMALIZATION = _Consts.define("BatchNormalization")
+        DENSE = const("Dense")
+        CONV2D = const("Conv2D")
+        MAX_POOLING2D = const("MaxPooling2D")
+        FLATTEN = const("Flatten")
+        LSTM = const("LSTM")
+        GRU = const("GRU")
+        BIDIRECTIONAL = const("Bidirectional")
+        DROPOUT = const("Dropout")
+        BATCH_NORMALIZATION = const("BatchNormalization")
 
     class Activation:
-        RELU = _Consts.define("relu")
-        SIGMOID = _Consts.define("sigmoid")
-        SOFTMAX = _Consts.define("softmax")
-        TANH = _Consts.define("tanh")
-        LINEAR = _Consts.define("linear")
+        RELU = const("relu")
+        SIGMOID = const("sigmoid")
+        SOFTMAX = const("softmax")
+        TANH = const("tanh")
+        LINEAR = const("linear")
 
     class Padding:
-        SAME = _Consts.define("same")
-        VALID = _Consts.define("valid")
+        SAME = const("same")
+        VALID = const("valid")
 
     class Pooling:
-        MAX = _Consts.define("max")
-        AVG = _Consts.define("avg")
+        MAX = const("max")
+        AVG = const("avg")
 
     # --------------------------------------------------
     # ファイルパス
     # --------------------------------------------------
     class PathName:
-        PARENT = _Consts.define("..")
-        DATASET = _Consts.define("dataset")
-        REPORTS = _Consts.define("reports")
-        MODELS = _Consts.define("models")
-        LOGS = _Consts.define("logs")
-        KEYS = _Consts.define("keys")
-
-        for p in [DATASET, REPORTS, MODELS]:
-            p.path = Path(p.get)
+        PARENT = Structs.PathName(const(".."))
+        DATASET = Structs.PathName(const("dataset"))
+        REPORTS = Structs.PathName(const("reports"))
+        MODELS = Structs.PathName(const("models"))
+        LOGS = Structs.PathName(const("logs"))
+        KEYS = Structs.PathName(const("keys"))
 
     # --------------------------------------------------
     # AWS
@@ -213,10 +260,10 @@ class consts(_Consts):
     class AWS:
         class S3:
             class Minio:
-                ACCESS_KEY = _Consts.define("minioadmin")
-                SECRET_KEY = _Consts.define("minioadmin")
-                ENDPOINT = _Consts.define("localhost:9000")
-                REGEON = _Consts.define("us-east-1")
+                ACCESS_KEY = const("minioadmin")
+                SECRET_KEY = const("minioadmin")
+                ENDPOINT = const("localhost:9000")
+                REGEON = const("us-east-1")
 
 
-__all__ = ['consts']
+__all__ = ['const', 'Const', 'Consts']

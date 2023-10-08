@@ -1,13 +1,21 @@
-from .consts import consts as _consts
-from .enums import enums as _enums
+# from typing import NamedTuple
+# from .consts import Const
+# from .consts import const
+from .consts import Consts as _Consts
+from .consts import Structs as _Structs
+from .enums import Enums as _Enums
 
 
-class consts(_consts):
+class Structs(_Structs):
     pass
 
 
-class enums(_enums):
+class Consts(_Consts):
     pass
 
 
-__all__ = ['consts', 'enums']
+class Enums(_Enums):
+    pass
+
+
+__all__ = ['Consts',  'Enums']

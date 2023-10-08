@@ -1,29 +1,29 @@
-from enum import Enum, auto
+import enum
+from enum import auto
 from typing import Callable
 
 
-class _Enum(Enum):
+class Enum(enum.Enum):
     def lower(self):
         return self.name.lower()
 
-    def from_name(name: str):
-        return _Enum.base[name.upper()]
+    @classmethod
+    def from_name(cls, name: str):
+        return cls[name.upper()]
 
 
-class enums:
-    base = _Enum
-
+class Enums:
     # --------------------------------------------------
     # 開発関連
     # --------------------------------------------------
-    class LogLevel(base):
+    class LogLevel(Enum):
         DEBUG = auto()
         INFO = auto()
         WARNING = auto()
         ERROR = auto()
         CRITICAL = auto()
 
-    class Status(base):
+    class Status(Enum):
         OK = auto()
         ERROR = auto()
         WARNING = auto()
@@ -31,7 +31,7 @@ class enums:
     # --------------------------------------------------
     # 汎用
     # --------------------------------------------------
-    class Week(base):
+    class Week(Enum):
         MON = ("Monday", "月", "月曜日")
         TUE = ("Tuesday", "火", "火曜日")
         WED = ("Wednesday", "水", "水曜日")
@@ -45,13 +45,13 @@ class enums:
             self.short_jp_name = names[1]
             self.jp_name = names[2]
 
-    class Season(base):
+    class Season(Enum):
         SPRING = "春"
         SUMMER = "夏"
         AUTUMN = "秋"
         WINTER = "冬"
 
-    class Month(base):
+    class Month(Enum):
         JAN = ("1月", "January")
         FEB = ("2月", "February")
         MAR = ("3月", "March")
@@ -71,26 +71,26 @@ class enums:
 
             self.val = int(self.jp_name[0:-1])
 
-    class Switch(base):
+    class Switch(Enum):
         ON = auto()
         OFF = auto()
 
-    class Color(base):
+    class RGB(Enum):
         RED = auto()
         GREEN = auto()
         BLUE = auto()
 
-    class Sex(base):
+    class Sex(Enum):
         MAN = "男"
         WOMAN = "女"
 
-    class Post(base):
+    class Post(Enum):
         PRESIDENT = auto()
         VICE_PRESIDENT = auto()
         MANAGER = auto()
         STAFF = auto()
 
-    class UserAgent(base):
+    class UserAgent(Enum):
         CHROME = auto()
         FIREFOX = auto()
         SAFARI = auto()
@@ -98,36 +98,36 @@ class enums:
         EDGE = auto()
         OPERA = auto()
 
-    class OS(base):
+    class OS(Enum):
         WINDOWS = auto()
         MAC = auto()
         LINUX = auto()
 
-    class DataExtension(base):
+    class DataExtension(Enum):
         EXCEL = (auto(), ".xlsx")
         CSV = (auto(), ".csv")
         JSON = (auto(), ".json")
         TXT = (auto(), ".txt")
 
-    class ImageExtension(base):
+    class ImageExtension(Enum):
         PNG = (auto(), ".png")
         JPG = (auto(), ".jpg")
         JPEG = (auto(), ".jpeg")
         GIF = (auto(), ".gif")
 
-    class WavExtension(base):
+    class WavExtension(Enum):
         WAV = (auto(), ".wav")
         MP3 = (auto(), ".mp3")
         OGG = (auto(), ".ogg")
 
-    class TextExtension(base):
+    class TextExtension(Enum):
         TXT = (auto(), ".txt")
         YML = (auto(), ".yml")
         YAML = (auto(), ".yaml")
         JSON = (auto(), ".json")
         XML = (auto(), ".xml")
 
-    class BinaryExtension(base):
+    class BinaryExtension(Enum):
         BIN = (auto(), ".bin")
         DAT = (auto(), ".dat")
         PTH = (auto(), ".pth")
@@ -136,34 +136,37 @@ class enums:
     # データ関連
     # --------------------------------------------------
 
-    class Empty(base):
-        NONE = (auto(), None)
-        STR = (auto(), "")
-        LIST = (auto(), [])
-        DICT = (auto(), {})
-        SET = (auto(), set())
-        TUPLE = (auto(), ())
-
-        def __init__(self, id_, val):
-            self.id = id_
-            self.val = val
+    class Empty(Enum):
+        NONE = auto()
+        STR = auto()
+        LIST = auto()
+        DICT = auto()
+        SET = auto()
+        TUPLE = auto()
 
         def __call__(self):
-            return self.val
+            return {
+                self.NONE: None,
+                self.STR: "",
+                self.LIST: [],
+                self.DICT: {},
+                self.SET: set(),
+                self.TUPLE: tuple()
+            }[self]
 
         @classmethod
         def check(cls, val):
-            return any([val == e.val for e in cls])
+            return any([val == e() for e in cls])
 
     # --------------------------------------------------
     # 学習モデル関連
     # --------------------------------------------------
-    class Mode(_Enum):
+    class Mode(Enum):
         TRAIN = auto()
         TEST = auto()
         EVAL = auto()
 
-    class Device(base):
+    class Device(Enum):
         CPU = "cuda"
         GPU = "cpu"
 
@@ -184,18 +187,18 @@ class enums:
     # --------------------------------------------------
     # 数理最適化関連
     # --------------------------------------------------
-    class OptimSolver(base):
+    class OptimSolver(Enum):
         SCIPY = auto()
         SCIP = auto()
         CBC = auto()
         CPLEX = auto()
         GUROBI = auto()
 
-    class OptimSense(base):
+    class OptimSense(Enum):
         MINIMIZE = auto()
         MAXIMIZE = auto()
 
-    class OptimStatus(base):
+    class OptimStatus(Enum):
         OPTIMAL = auto()
         INFEASIBLE = auto()
         UNBOUNDED = auto()
@@ -203,14 +206,14 @@ class enums:
         ERROR = auto()
         NOT_SOLVED = auto()
 
-    class OptimResult(base):
+    class OptimResult(Enum):
         SUCCESS = auto()
         FAILURE = auto()
 
-    class OptimConstraint(base):
+    class OptimConstraint(Enum):
         LE = auto()
         GE = auto()
         EQ = auto()
 
 
-__all__ = ['enums']
+__all__ = ['Enum', 'Enums']

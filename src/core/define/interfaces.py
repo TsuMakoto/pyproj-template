@@ -27,10 +27,50 @@ class Model(Protocol, Generic[I_, O_]):
     def __call__(self, input_: I_) -> O_:
         ...
 
+# --------------------------------------------
+# 数理最適化のためのインターフェース
+# --------------------------------------------
 
-class Optimizater(Model, Generic[I_, O_]):
+
+class OptimModel(Model, Generic[I_, O_]):
     ...
 
+
+class OptimProblem(Protocol, Generic[I_, O_]):
+    def __init__(self, params):
+        ...
+
+    def make(self, input_: I_) -> O_:
+        ...
+
+
+class Constraint(Protocol, Generic[I_, O_]):
+    def __init__(self, params):
+        ...
+
+    def __call__(self, input_: I_) -> O_:
+        ...
+
+
+class Objective(Protocol, Generic[I_, O_]):
+    def __init__(self, params):
+        ...
+
+    def __call__(self, input_: I_) -> O_:
+        ...
+
+
+class Solver(Protocol, Generic[I_, O_]):
+    def __init__(self, params):
+        ...
+
+    def solve(self, input_: I_) -> O_:
+        ...
+
+
+# --------------------------------------------
+# 機械学習のためのインターフェース
+# --------------------------------------------
 
 class Net(Model, Generic[I_, O_]):
     def forward(self, input_: I_) -> O_:
@@ -72,7 +112,11 @@ class APICaller(Protocol, Generic[I_, O_]):
 IHandler = Handler
 IDataLoader = DataLoader
 IModel = Model
-IOptimizater = Optimizater
+IOptimModel = OptimModel
+IOptimProblem = OptimProblem
+IConstraint = Constraint
+IObjective = Objective
+ISolver = Solver
 INet = Net
 ITrainer = Trainer
 IEvaluator = Evaluator
