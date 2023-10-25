@@ -1,10 +1,12 @@
-tmp/*
-reports/*
-logs/*
 datasets/*
+logs/*
+models/*
+reports/*
+tmp/*
 .virtual_documents
 .ipynb_checkpoints
 keys/*
 __pycache__
+.DS_Store
 
 !**/.keep

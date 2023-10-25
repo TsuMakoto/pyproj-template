@@ -10,15 +10,25 @@ pandas = "*"
 openpyxl = "*"
 pyyaml = "*"
 dill = "*"
-
+geopy = "*"
+amplpy = "*"
+pulp = "*"
+sympy = "*"
+umap-learn = "*"
+scikit-learn = "*"
 
 [dev-packages]
 # コードフォーマッター
+black = "*"
 isort = "*"
 autopep8 = "*"
 flake8 = "*"
 jedi = "*"
-
+mypy = "*"
+yapf = "*"
+pyright = "*"
+# ドキュメント
+latexify-py = "*"
 # notebook
 ipywidgets = "*"
 matplotlib = "*"
@@ -26,30 +36,24 @@ jupyter = "*"
 jupyterlab = "*"
 seaborn = "*"
 tqdm = "*"
-
 # デバッグ/検証
 ipython = "*"
 ipdb = "*"
 pytest = "*"
-
 # ログ
 loguru = "*"
-
 # AWS
 minio = "*"
 chalice = "*"
 boto3 = "*"
-
 # visualization
 mitoinstaller = "*"
 autoviz = "*"
-
 pycaret = "*" # auto ml
-
+folium = "*"
 # 入力系
 click = "*"
 fire = "*"
-
 # グラフ
 networkx = "*"
 
@@ -57,5 +61,4 @@ networkx = "*"
 python_version = "3.10"
 
 [scripts]
-install_mito = "python -m mitoinstaller install"
 install_labextensions = "jupyter labextension install @jupyter-widgets/jupyterlab-manager"
