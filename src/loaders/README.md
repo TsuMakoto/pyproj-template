@@ -3,52 +3,32 @@
 以下に例
 
 ```python
-from pathlib import Path
 from typing import NamedTuple
 
-import numpy as np
-import pandas as pd
-from src.core.flow import I
-from src.core.helper.decorators.tuple_to import free
-from src.core.settings.enums import enums
+from src.core.structs import ILoader
 
+from src.core.helper import logger
 
 class struct:
-    class Params(NamedTuple):
-        delimiter: str = enums.FileUtils.Delimiter.COMMA
-        dataroot: Path = enums.Path.PRIVATE_DATASETS
+  class Params(NamedTuple):
+    ...
 
-    class Input(NamedTuple):
-        dataname: Path | str
+  class Input(NamedTuple):
+    ...
 
-    class Output(pd.DataFrame):
-        id: "pd.Series[int]"
-        name: "pd.Series[str]"
-        address: "pd.Series[str]"
+  class Output(NamedTuple):
+    ...
 
-class DataLoader(I.Loader):
-    @free(struct.Params)
+class types:
+  Loader = ILoader[struct.Input, struct.Output]
+
+
+class DataLoader(types.Loader):
     def __init__(self, params: struct.Params):
         self.params = params
 
-    @free(struct.Input)
+    @logger.execution_time
     def load(self, ipt: struct.Input) -> struct.Output:
-        ext = enums.Extensions.Text.TXT
-        delimiter = self.params.delimiter
-
-        data = np.loadtxt(self.params.dataroot / (ipt.dataname + ext)
-
-        df = pd.DataFrame(data=data, columns=["id", "name", "address"])
-
-        return df
+        return struct.Output()
 ```
 
-```shell
-$ params = struct.Params()
-$ ipt = struct.Input("user")
-$ DataLoader(params).load(ipt)
-
-# or
-
-$ DataLoader().load("user") # ただし、型エラー
-```

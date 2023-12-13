@@ -5,28 +5,39 @@ name = "pypi"
 
 [packages]
 # python-dotenv = "*"
-# numpy = "*"
-# pandas = "*"
 # openpyxl = "*"
-# pyyaml = "*"
 # dill = "*"
 # geopy = "*"
 # amplpy = "*"
-# pulp = "*"
 # sympy = "*"
 # umap-learn = "*"
 # scikit-learn = "*"
+numpy = "*"
+pandas = "*"
+pyyaml = "*"
+pulp = "*"
+networkx = "*"
+click = "*"
+loguru = "*"
+typing-extensions = "*"
 
 [dev-packages]
 # # コードフォーマッター
-# black = "*"
-# isort = "*"
-# autopep8 = "*"
-# flake8 = "*"
-# jedi = "*"
-# mypy = "*"
-# yapf = "*"
-# pyright = "*"
+# # コードフォーマッター
+isort = "*"
+flake8 = "*"
+mypy = "*"
+pyright = "*"
+tox = "*"
+black = "*"
+# stub
+types-pyyaml = "*"
+pandas-stubs = "*"
+networkx-stubs = "*"
+# # デバッグ/検証
+ipython = "*"
+ipdb = "*"
+pytest = "*"
 # # ドキュメント
 # latexify-py = "*"
 # # notebook
@@ -36,12 +47,6 @@ name = "pypi"
 # jupyterlab = "*"
 # seaborn = "*"
 # tqdm = "*"
-# # デバッグ/検証
-# ipython = "*"
-# ipdb = "*"
-# pytest = "*"
-# # ログ
-# loguru = "*"
 # # AWS
 # minio = "*"
 # chalice = "*"
@@ -51,11 +56,7 @@ name = "pypi"
 # autoviz = "*"
 # pycaret = "*" # auto ml
 # folium = "*"
-# # 入力系
-# click = "*"
 # fire = "*"
-# # グラフ
-# networkx = "*"
 
 [requires]
 python_version = "3.10"

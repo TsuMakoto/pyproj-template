@@ -5,13 +5,9 @@ from typing import Callable
 
 
 class Enum(enum.Enum):
-    @property
-    def lower(self):
-        return self.name.lower()
-
     @classmethod
-    def from_name(cls, name: str):
-        return cls[name.upper()]
+    def names(cls):
+        return [e.name for e in cls]
 
 
 class enums:
@@ -202,7 +198,7 @@ class enums:
                     self.LIST: [],
                     self.DICT: {},
                     self.SET: set(),
-                    self.TUPLE: tuple()
+                    self.TUPLE: tuple(),
                 }[self]
 
             @classmethod
@@ -242,11 +238,12 @@ class enums:
             GPU = "cpu"
 
             @classmethod
-            def use(cls,
-                    gpu_availablility: Callable[[], bool],
-                    gpu_name: str = "",
-                    gpu_number: int = 0) -> str:
-
+            def use(
+                cls,
+                gpu_availablility: Callable[[], bool],
+                gpu_name: str = "",
+                gpu_number: int = 0,
+            ) -> str:
                 if not gpu_availablility():
                     return cls.CPU.value
 

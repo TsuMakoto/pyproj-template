@@ -1,0 +1,70 @@
+name: Actions
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+      # - name: Install required modeuls
+      #   run: sudo apt-get install -y coinor-cbc
+
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies with pipenv
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install pipenv
+        pipenv install --dev
+
+    - name: Check your installed dependencies for security vulnerabilities
+      run: |
+        pipenv check
+
+    - name: Check consistency between Pipfile and requirements.txt
+      run: |
+        python -m pip install -r requirements.txt
+
+    - name: Check consistency between Pipfile and requirements.dev.txt
+      run: |
+        python -m pip install -r requirements.dev.txt
+
+    - name: Run linter auto-collection
+      run: |
+        pipenv run black src tests gallery
+
+    - name: Run tox
+      run: |
+        pipenv run tox
+
+    - name: Sync pipenv and requirements.txt
+      run: |
+        pipenv requirements > requirements.txt
+        pipenv requirements --dev > requirements.dev.txt
+
+    - name: Push changes requirements.txt
+      run: |
+        git config user.name github-actions
+        git config user.email github-actions@github.com
+        git add requirements*
+        git add src tests gallery
+        git commit -m "Update by github-actions" --allow-empty
+
+        # secretsのSECRET_TOKENを設定する
+        # - name: Push changes
+        #   uses: ad-m/github-push-action@master
+        #   with:
+        #     github_token: ${{ secrets.SECRET_TOKEN }}
+        #     branch: ${{ github.head_ref }}
+        #     repository: 'xxx/repository'

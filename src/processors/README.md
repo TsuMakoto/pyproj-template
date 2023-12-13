@@ -5,35 +5,30 @@
 ```python
 from typing import NamedTuple
 
-import numpy as np
-import pandas as pd
-from numpy.typing import NDArray
-from src.core.flow import I
-from src.core.helper.decorators.tuple_to import free
-from src.services import data_processing
+from src.core.structs import IProcessor
 
+from src.core.helper import logger
 
 class struct:
-    class Params(NamedTuple):
-        pass
+  class Params(NamedTuple):
+    ...
 
-    class Input(NamedTuple):
-        df: pd.DataFrame
+  class Input(NamedTuple):
+    ...
 
-    class Output(NamedTuple):
-        features: NDArray[np.float64]
+  class Output(NamedTuple):
+    ...
+
+class types:
+  Processor = IProcessor[struct.Input, struct.Output]
 
 
-class Processor(I.Processor):
-    @free(struct.Params)
+
+class Processor(types.Processor):
     def __init__(self, params: struct.Params):
-        self.window_size = params.window_size
+      ...
 
-    @free(struct.Input)
+    @logger.execution_time
     def run(self, ipt: struct.Input) -> struct.Output:
-        df = ipt.df
-
-        features = data_processing.standard_scaler(df)
-
-        return struct.Output(features=features)
+      return struct.Output()
 ```
