@@ -62,6 +62,7 @@ jobs:
         git commit -m "Update by github-actions" --allow-empty
 
         # secretsのSECRET_TOKENを設定する
+        # secretはhttps://github.com/settings/tokensから作成
         # - name: Push changes
         #   uses: ad-m/github-push-action@master
         #   with:
