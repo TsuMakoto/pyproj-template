@@ -38,6 +38,12 @@ class ValidateDict(Mapping):
     def __exit__(self, exc_type, exc_value, traceback):
         pass
 
+    def __iter__(self):
+        return iter(dict(**self))
+
+    def __len__(self):
+        return len(dict(**self))
+
     def forall(self, key: str):
         if key not in self:
             raise KeyError(f"Key '{key}' is not found.")
@@ -49,10 +55,10 @@ class ValidateDict(Mapping):
 
         validates: list["ValidateDict"] = []
         for e in d:
-            if not isinstance(e, dict):
-                raise TypeError(f"Key '{key}' is not instance of 'TypedDict'.")
-            else:
+            if isinstance(e, dict):
                 validates.append(ValidateDict(**e))
+            else:
+                raise TypeError(f"Key '{key}' is not instance of 'TypedDict'.")
         return validates
 
     def __call__(self, key: str):

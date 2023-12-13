@@ -13,11 +13,16 @@ class Enum(enum.Enum):
 class enums:
     class System:
         class LogLevel(Enum):
-            DEBUG = auto()
-            INFO = auto()
-            WARNING = auto()
-            ERROR = auto()
-            CRITICAL = auto()
+            TRACE = "white", "bold"
+            DEBUG = "white", "bold"
+            INFO = "green", "bold"
+            WARNING = "yellow", "bold"
+            ERROR = "red", "bold"
+            CRITICAL = "white", "bold"
+
+            def __init__(self, color: str, style: str):
+                self.color = color
+                self.style = style
 
         class Status(Enum):
             OK = auto()
